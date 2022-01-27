@@ -1,5 +1,0 @@
-library("spacyr")
-spacy_install()
-spacy_initialize(model="zh_core_web_sm")
-data<-read_csv("~/Desktop/NCCU-TM026-CN-MM (Sample data)  - Transcribing (1).csv")
-parsedfile<-spacy_parse(data$Sequence$Speaker$Utterance, lemma = TRUE, pos=TRUE, tag=TRUE)
