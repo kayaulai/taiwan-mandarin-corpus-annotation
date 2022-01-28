@@ -33,8 +33,12 @@ result= data %>%
                           gsub('\\]{2}', '2]', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "X"),
                           gsub('X', '#', Utterance),Utterance)) %>%
-  rename(c(Sequence = "TurnSeq")) %>%
+  mutate(Speaker=ifelse(str_detect(Speaker, "M1:"),
+                          gsub('M1:', 'M1', Speaker),Speaker)) %>%
+  mutate(Speaker=ifelse(str_detect(Speaker, "M2:"),
+                          gsub('M2:', 'M2', Speaker),Speaker)) %>%
+  rename(c(TurnSeq = "Sequence")) %>%
   mutate(TurnSeq=x) %>%
   mutate(IUSeq=seq(1,length(data$Utterance)))
 
-write.csv(result,"modifieddata.csv")
+write.csv(result,"modifieddata.csv",fileEncoding = "UTF-8")
