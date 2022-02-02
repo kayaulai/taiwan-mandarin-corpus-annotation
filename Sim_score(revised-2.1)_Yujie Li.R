@@ -2,8 +2,8 @@ library(data.table)
 library(readr)
 library(reshape)
 
-l1="{ }{,}{,}{ }{.}{ }{ }{,}{.}{ }{-}{,}{ }{,}"
-l2="{ }{ }{,}{-}{!}{,}{ }{ }{.}{,}{ }{ }{-}{,}"
+# "{ }{,}{,}{ }{.}{ }{ }{,}{.}{ }{-}{,}{ }{,}"
+# "{ }{ }{,}{-}{!}{,}{ }{ }{.}{,}{ }{ }{-}{,}"
 
 # Replace NA speakers
 reNA<-function(d){
@@ -16,6 +16,7 @@ reNA<-function(d){
 }  # input data from csv
 
 # Seperate speakers
+# return dataframe of columns for different speakers
 sepSpeaker<-function(d){
   num_speaker=length(levels(as.factor(d$Speaker)))  
   # Create empty datadrame
@@ -33,6 +34,7 @@ sepSpeaker<-function(d){
 }  # input reNA
 
 # Generate boundry lists
+# return one list of boundry 
 genBd<-function(d,sep){
   num_speaker=length(levels(as.factor(d$Speaker)))
   bd=data.frame(array(c('',''),dim = c(1,1,num_speaker)))
@@ -54,7 +56,10 @@ genBd<-function(d,sep){
 }  # input reNA, sepSpeaker
 
 # Delete same empty
-delEmpty<-function(l1,l2){
+# return a cbind of the two boundry list (4 columns)
+# two lists for calCost: cbind(delEmpty[1], delEmpty[2]), cbind(delEmpty[3], delEmpty[4])
+delEmpty<-function(d,l1,l2){
+  num_speaker=length(l1)
   if (length(l1)!=length(l2)){
     return ("different speakers try again")
   }  # check speaker num
@@ -84,6 +89,7 @@ return(c(r1,r2))
 }  # input 2 genBd
 
 # Calculate cost of two boundry lists
+# return minimum cost
 # add/del/sub=1 cost£¬ trans=0.5 cost
 calCost<-function(l1,l2){
   if (length(l1)!=length(l2)){
@@ -152,6 +158,7 @@ calCost<-function(l1,l2){
 }  # input 2 delEmpty
 
 # Calculate bound number
+# return word count -1
 bdNum<- function(bd){  # input boundry list
   n=0
   l=0
@@ -169,31 +176,34 @@ bdNum<- function(bd){  # input boundry list
 }  # input genBd
 
 # calculate sim score
-simScore<- function(n, cost){
+# return simularity score 
+score<- function(n, cost){
   return((n-cost)/(n))
 }  # input bdNum, calCost
 
+# overall function
+# return the simularity score of two annotations
+simScore<-function(d1, d2){
+  d1=reNA(d1)
+  d2=reNA(d2)
+  se1=sepSpeaker(d1)
+  se2=sepSpeaker(d2)
+  bdlist1=genBd(d1,se1)
+  bdlist2=genBd(d2,se2)
+  emplist1=cbind(delEmpty(d1,bdlist1,bdlist2)[1],delEmpty(d1,bdlist1,bdlist2)[2])
+  emplist2=cbind(delEmpty(d1,bdlist1,bdlist2)[3],delEmpty(d1,bdlist1,bdlist2)[4])
+  
+  cost=calCost(emplist1,emplist2)
+  bdNumber=bdNum(bdlist1)
+  sim=score(bdNumber,cost)
+  
+  return (sim)
+}  # input two read_csv of different annotation
 
-# main (example)
-data1=read_csv("modifieddata.csv")
-data2=read_csv("modifieddata1.csv")
-data1=reNA(data1)
-data2=reNA(data2)
-se1=sepSpeaker(data1)
-se2=sepSpeaker(data2)
-bdlist1=genBd(data1,se1)
-bdlist2=genBd(data2,se2)
-emplist1=cbind(delEmpty(bdlist1,bdlist2)[1],delEmpty(bdlist1,bdlist2)[2])
-emplist2=cbind(delEmpty(bdlist1,bdlist2)[3],delEmpty(bdlist1,bdlist2)[4])
-
-cost=calCost(emplist1,emplist2)
-bdNumber=bdNum(bdlist1)
-sim=simScore(bdNumber,cost)
-
-
-
-
+# check the difference of the two annotation 
+# print the different pairs of boundries in order
 checkdiff<-function(l1,l2){
+  num_speaker=length(l1)
   for (s in seq(1,num_speaker)){  
     for (i in seq(1,nchar(l1[s]))){ 
       if (substring(l1[1,s],i,i) != substring(l2[1,s],i,i)){
@@ -201,7 +211,15 @@ checkdiff<-function(l1,l2){
       }
     }
   }
-}
+}  # input two genBd
+
+# main (example)
+data1=read_csv("modifieddata.csv")
+data2=read_csv("modifieddata1.csv")
+simScore(data1,data2)
+
+
+
 
 
 
