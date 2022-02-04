@@ -5,6 +5,7 @@ library(reshape)
 # "{ }{,}{,}{ }{.}{ }{ }{,}{.}{ }{-}{,}{ }{,}"
 # "{ }{ }{,}{-}{!}{,}{ }{ }{.}{,}{ }{ }{-}{,}"
 
+
 # Replace NA speakers
 reNA<-function(d){
   for (i in seq(1,length(d$Utterance))){  # for each row
@@ -150,6 +151,16 @@ calCost<-function(l1,l2){
           dpArray[i, j]=min(dpArray[i, j],
                             dpArray[i-2, j-2] + transCost)  # transposition
         }
+        
+        if (e1==' '){
+          dpArray[i, j]=min(dpArray[i, j],
+                            dpArray[i-1, j])  # transposition
+        }
+        if (e2==' '){
+          dpArray[i, j]=min(dpArray[i, j],
+                            dpArray[i, j-1])  # transposition
+        }
+        
       }
     }
     cost=cost+dpArray[nchar(l1[s])+1, nchar(l2[s])+1]
