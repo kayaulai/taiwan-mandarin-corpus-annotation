@@ -93,6 +93,9 @@ calCost<-function(l1,l2){
         }
       }
     }
+    cost=cost+parSim(t1,t2)
+    t1=""
+    t2=""
   }
   return(cost)
 }  # input 2 genBd
@@ -160,3 +163,15 @@ bdlist2=genBd(data2,se2)
 cost=calCost(bdlist1,bdlist2)
 bdNumber=bdNum(bdlist1)
 sim=simScore(bdNumber,cost)
+
+
+l1=",? "
+l11=" "
+l2=" ,?"
+l22=" "
+a=cbind(l1,l11)
+b=cbind(l2,l22)
+calCost(a,b)
+
+
+
