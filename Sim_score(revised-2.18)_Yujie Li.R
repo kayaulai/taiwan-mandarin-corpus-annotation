@@ -4,8 +4,6 @@ library(reshape)
 
 "{ }{,}{,}{ }{.}{ }{ }{,}{.}{ }{-}{,}{ }{,}"
 "{ }{ }{,}{-}{!}{,}{ }{ }{.}{,}{ }{ }{-}{,}"
-"{,}{?}{ }"
-"{ }{,}{?}"
 
 # Replace NA speakers
 reNA<-function(d){
@@ -15,7 +13,7 @@ reNA<-function(d){
     }
   }
   return(d)
-}  # input data from csv
+}  # input modified data from csv
 
 # Seperate speakers
 sepSpeaker<-function(d){
@@ -45,7 +43,9 @@ genBd<-function(d,sep){
     for (i in seq(1,length(sep[,s]))){  # for each row
       if (!(is.na(sep[i,s]))){
         for (j in seq(2,nchar(sep[i,s])-1)){  # for each element
-          bd[1,s]=paste0(bd[1,s]," ")
+          if (substring(sep[i,s],j,j)==" "){
+            bd[1,s]=paste0(bd[1,s]," ")
+          }
         }
         bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
                                                 nchar(sep[i,s]),
@@ -152,26 +152,14 @@ simScore<- function(n, cost){
 }  # input bdNum, calCost
 
 # main (example)
-data1=read_csv("modifieddata.csv")
-data2=read_csv("modifieddata1.csv")
-data1=reNA(data1)
-data2=reNA(data2)
-se1=sepSpeaker(data1)
-se2=sepSpeaker(data2)
-bdlist1=genBd(data1,se1)
-bdlist2=genBd(data2,se2)
+data=read_csv("modifieddata2.csv")
+data=reNA(data)
+se=sepSpeaker(data)
+bdlist=genBd(data,se)
 cost=calCost(bdlist1,bdlist2)
 bdNumber=bdNum(bdlist1)
 sim=simScore(bdNumber,cost)
 
-
-l1=",? "
-l11=" "
-l2=" ,?"
-l22=" "
-a=cbind(l1,l11)
-b=cbind(l2,l22)
-calCost(a,b)
 
 
 
