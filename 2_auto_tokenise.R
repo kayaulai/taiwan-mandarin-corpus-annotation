@@ -2,10 +2,12 @@ library(spacyr)
 library(tidyverse)
 library("stringr")
 library(dplyr)
-install.packages("stringr")              
 spacy_install(lang_models="zh_core_web_sm")
 spacy_initialize(model="zh_core_web_sm")
-data<-read_csv("NCCU-TM026-CN-MM_Shujie Zhang.csv")
+
+file_name <- "NCCU-TM017 - Sheet1.csv"  # Only change the file path to the input file in <1_auto_split>
+data <- read_csv(paste0("1_auto_split/", file_name))
+
 unlist(data$Utterance)
 parsedfile <- str_replace_all(data$Utterance,"[[:print:]]","")
 parsedfile<-spacy_tokenize(data$Utterance)
@@ -91,4 +93,4 @@ test
 
 change_column=unlist(test)
 data=mutate(data, Utterance = change_column)
-write.csv(data,"tokenize.csv")
+write_csv(data,paste0("2_auto_tokenised/", file_name))
