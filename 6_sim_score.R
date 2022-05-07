@@ -59,7 +59,7 @@ genBd <- function(d,sep){
                                                   nchar(sep[i,s]),
                                                   nchar(sep[i,s]))))
         }else{
-          bd[1,s]=paste0(bd[1,s],"@")
+          bd[1,s]=paste0(bd[1,s],"~")
         }
       }
     }
