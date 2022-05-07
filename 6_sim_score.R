@@ -52,9 +52,15 @@ genBd <- function(d,sep){
             bd[1,s]=paste0(bd[1,s]," ")
           }
         }
-        bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
-                                                nchar(sep[i,s]),
-                                                nchar(sep[i,s]))))
+        if(substring(sep[i,s],
+                     nchar(sep[i,s]),
+                     nchar(sep[i,s])) %in% c(",", ".","?", "+", ";")){
+          bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
+                                                  nchar(sep[i,s]),
+                                                  nchar(sep[i,s]))))
+        }else{
+          bd[1,s]=paste0(bd[1,s],"@")
+        }
       }
     }
   }
