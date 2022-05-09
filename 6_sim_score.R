@@ -25,7 +25,7 @@ reNA <- function(d){
 sepSpeaker <- function(d){
   num_speaker=length(levels(as.factor(d$Speaker)))  # numbder of speakers
   # Create empty datadrame
-  sep=data.frame(array(dim = c(max(summary(as.factor(d$Speaker))),1,2))) # seperation result
+  sep=data.frame(array(dim = c(max(summary(as.factor(d$Speaker))),1,num_speaker))) # seperation result
   colnames(sep)=levels(as.factor(d$Speaker))
   # Seperate
   for (s in seq(1,num_speaker)){  # for each speaker
@@ -409,8 +409,8 @@ sim_Score<-function(d1,d2, record = FALSE){
 }
 
 # main (example)
-data1=read_csv("modifieddata1.csv")
-data2=read_csv("modifieddata2.csv")
+data1=read_csv('NCCU-TM049_Shujie&Danni.csv')
+data2=read_csv('NCCU-TM049_Shujie&Danni2.csv')
 sim_Score(data1,data2)
 
 
