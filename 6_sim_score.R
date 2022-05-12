@@ -54,12 +54,12 @@ genBd <- function(d,sep){
         }
         if(substring(sep[i,s],
                      nchar(sep[i,s]),
-                     nchar(sep[i,s])) %in% c(",", ".","?", "+", ";")){
+                     nchar(sep[i,s])) %in% c(",", ".","?", "+", "-")){
           bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
                                                   nchar(sep[i,s]),
                                                   nchar(sep[i,s]))))
         }else{
-          bd[1,s]=paste0(bd[1,s],"~")
+          bd[1,s]=paste0(bd[1,s],";")
         }
       }
     }
@@ -407,10 +407,23 @@ sim_Score<-function(d1,d2, record = FALSE){
     return(sim)
   }
 }
+createBD <-function(d){
+  d1=reDS(d)
+  d1=reNA(d1)
+  se1=sepSpeaker(d1)
+  bdlist1=genBd(d1,se1)
+  return(bdlist1)
+}
+
 
 # main (example)
 data1=read_csv('NCCU-TM049_Shujie&Danni.csv')
 data2=read_csv('NCCU-TM049_Shujie&Danni2.csv')
 sim_Score(data1,data2)
+
+# for inter-annotated agreement
+createBD(data1) # create boundry list for a data file
+createBD(data1)$F1  # boundry list for speaker F1
+bdNum(createBD(data1))  # calculate the number of boundries for a file
 
 
