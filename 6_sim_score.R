@@ -39,8 +39,23 @@ sepSpeaker <- function(d){
 }  # input reNA
 # Generate boundry lists
 # return one list of boundary 
+# + for --
+# ; for IU boundry without a punctuation
 genBd <- function(d,sep){
   num_speaker=length(levels(as.factor(d$Speaker))) # number of speakers
+  # remove empty space before punc
+  for (s in seq(1,num_speaker)){  # for each speaker
+    for (i in seq(1,length(sep[,s]))){  # for each row
+      if (!(is.na(substr(sep[i,s],nchar(sep[i,s])-1,nchar(sep[i,s])-1)))){
+        if (substr(sep[i,s],nchar(sep[i,s])-1,nchar(sep[i,s])-1) == " "){
+          sep[i,s] = paste0(substr(sep[i,s],1,nchar(sep[i,s])-2), 
+                            substr(sep[i,s],nchar(sep[i,s]),nchar(sep[i,s])))
+        }
+      }
+    }
+  }
+  
+  
   bd=data.frame(array(c('',''),dim = c(1,1,num_speaker)))  # result boundry list
   colnames(bd)=levels(as.factor(d$Speaker))
   # fill in boundry lists
@@ -54,7 +69,7 @@ genBd <- function(d,sep){
         }
         if(substring(sep[i,s],
                      nchar(sep[i,s]),
-                     nchar(sep[i,s])) %in% c(",", ".","?", "+", "-")){
+                     nchar(sep[i,s])) %in% c(",", ".","?", "+")){
           bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
                                                   nchar(sep[i,s]),
                                                   nchar(sep[i,s]))))
@@ -425,5 +440,7 @@ sim_Score(data1,data2)
 createBD(data1) # create boundry list for a data file
 createBD(data1)$F1  # boundry list for speaker F1
 bdNum(createBD(data1))  # calculate the number of boundries for a file
+
+
 
 
