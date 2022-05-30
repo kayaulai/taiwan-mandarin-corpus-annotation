@@ -314,7 +314,7 @@ parSim1<- function(t1,t2){
       return(parSim1(s1,s2))
     }else{
       if(e1!=" " & e2!=" "){
-        return(subCost+parSim1)
+        return(subCost+parSim1(s1,s2))
       }else{
         if ((substring(t2,2,2)!=" " & substring(t2,1,1)==" ")
             | (substring(t2,2,2)==" " & substring(t2,1,1)!=" ")){
@@ -432,15 +432,12 @@ createBD <-function(d){
 
 
 # main (example)
-data1=read_csv('NCCU-TM049_Shujie&Danni.csv')
-data2=read_csv('NCCU-TM049_Shujie&Danni2.csv')
+d1=read_csv('modifieddata1.csv')
+d2=read_csv('modifieddata2.csv')
 sim_Score(data1,data2)
 
 # for inter-annotated agreement
 createBD(data1) # create boundry list for a data file
 createBD(data1)$F1  # boundry list for speaker F1
 bdNum(createBD(data1))  # calculate the number of boundries for a file
-
-
-
 
