@@ -69,7 +69,7 @@ genBd <- function(d,sep){
         }
         if(substring(sep[i,s],
                      nchar(sep[i,s]),
-                     nchar(sep[i,s])) %in% c(",", ".","?", "+")){
+                     nchar(sep[i,s])) %in% c(",", ".","?", "+","-")){
           bd[1,s]=paste0(bd[1,s],paste0(substring(sep[i,s],
                                                   nchar(sep[i,s]),
                                                   nchar(sep[i,s]))))
@@ -84,10 +84,12 @@ genBd <- function(d,sep){
 # With record
 # Calculate cost of two boundary lists
 # sub=1 cost, trans=0.5 cost/dist 
-calCost <- function(l1,l2){
+calCost <- function(l1,l2,m){
   record=data.frame()  # result dataframe of record process
   subCost=1  # pre-set substitution cost
   transCost=0.5  # pre-set transition cost of one space
+  order= c(",", ".", "?", "-", "+", ";", " ")
+  m=1-m
   if (length(l1)!=length(l2)){
     return ("different speakers try again")
   }  # check speaker num
@@ -124,7 +126,7 @@ calCost <- function(l1,l2){
           t2=""}
       }else{
         if (e1!=e2 & e1!=" " & e2!=" " ){
-          cost=cost+subCost
+          cost=cost+m[which (order == e1),which (order == e2)]
           if (paresult[2] !=""){
             df=data.frame(speaker=s,
                           type="s",
@@ -181,12 +183,15 @@ calCost <- function(l1,l2){
 }  # input 2 genBd
 # With record
 # Calculate cost between each sub string Without record
-parSim <- function(t1,t2){
-  subCost=1
+parSim <- function(t1,t2,m){
   transCost=0.5
   
   e1 =t1$e[1] # first element of t1
   e2 =t2$e[1] # first element of t2
+  
+  order= c(",", ".", "?", "-", "+", ";", " ")
+  m=1-m
+  subCost = m[which (order == e1),which (order == e2)]
   
   s1=t1[2:nrow(t1),]  # sublist without first element
   s2=t2[2:nrow(t2),]
@@ -246,11 +251,24 @@ parSim <- function(t1,t2){
   }
 }  # input two sub boundry list
 # Without record
-# Calculate cost of two boundary lists
-calCost1<-function(l1,l2){
+# Calculate cost of two boundary lists, and confusion matrix m 
+# ","  "." "?" "-" "+" ";" " "
+# + for --
+# ; for IU boundry without a punctuation
+# in m is simscore subcost=(1-cost)/1
+# order= c(",", ".", "?", "-", "+", ";", " ")
+# m=matrix(data =c(1,0,0,0,0,0,0,
+#                  0,1,0,0,0,0,0,
+#                  0,0,1,0,0,0,0,
+#                  0,0,0,1,0,0,0,
+#                  0,0,0,0,1,0,0,
+#                  0,0,0,0,0,1,0,
+#                  0,0,0,0,0,0,1), nrow=7)
+calCost1<-function(l1,l2, m){
   record=data.frame()
-  subCost=1
+  order= c(",", ".", "?", "-", "+", ";", " ")
   transCost=0.5
+  m=1-m
   if (length(l1)!=length(l2)){
     return ("different speakers try again")
   }  # check speaker num
@@ -274,7 +292,7 @@ calCost1<-function(l1,l2){
         t2=""
       }else{
         if (e1!=e2 & e1!=" " & e2!=" " ){
-          cost=cost+subCost
+          cost=cost+m[which (order == e1),which (order == e2)]
           record=rbind(record,data.frame(old= e1, new = e2))
           cost=cost+parSim1(t1,t2)
           # record
@@ -295,9 +313,10 @@ calCost1<-function(l1,l2){
 }  # input 2 genBd
 # Without record
 # Calulate cost between each sub string Without record
-parSim1<- function(t1,t2){
-  subCost=1
+parSim1<- function(t1,t2, m){
+  order= c(",", ".", "?", "-", "+", ";", " ")
   transCost=0.5
+  m=1-m
   e1 =substring(t1,1,1)
   e2 =substring(t2,1,1)
   s1=substring(t1,2,nchar(t1))
@@ -307,20 +326,20 @@ parSim1<- function(t1,t2){
     if (e1==e2){
       return (0)
     }else{
-      return (subCost)
+      return (m[which (order == e1),which (order == e2)])
     }
   }else{
     if (e1==e2){
       return(parSim1(s1,s2))
     }else{
       if(e1!=" " & e2!=" "){
-        return(subCost+parSim1(s1,s2))
+        return(m[which (order == e1),which (order == e2)]+parSim1(s1,s2))
       }else{
         if ((substring(t2,2,2)!=" " & substring(t2,1,1)==" ")
             | (substring(t2,2,2)==" " & substring(t2,1,1)!=" ")){
-          return(min(subCost+parSim1(s1,s2),transCost+parSim1(t1,t)))
+          return(min(m[which (order == e1),which (order == e2)]+parSim1(s1,s2),transCost+parSim1(t1,t)))
         }else{
-          return(subCost+parSim1(s1,s2))
+          return(m[which (order == e1),which (order == e2)]+parSim1(s1,s2))
         }
       }
     }
@@ -399,7 +418,13 @@ checkDiff <- function(l1,l2){
   return(data.frame(d1,d2))
 }
 # final function (record = TRUE produce the step of change but it will be super slow)
-sim_Score<-function(d1,d2, record = FALSE){
+sim_Score<-function(d1,d2, record = FALSE, m=matrix(data =c(1,0,0,0,0,0,0,
+                                                            0,1,0,0,0,0,0,
+                                                            0,0,1,0,0,0,0,
+                                                            0,0,0,1,0,0,0,
+                                                            0,0,0,0,1,0,0,
+                                                            0,0,0,0,0,1,0,
+                                                            0,0,0,0,0,0,1), nrow=7)){
   d1=reDS(d1)
   d1=reNA(d1)
   se1=sepSpeaker(d1)
@@ -416,7 +441,7 @@ sim_Score<-function(d1,d2, record = FALSE){
     sim=simScore(bdNumber,as.numeric(cost[1]))
     return(c(cost,sim))
   }else{
-    cost=calCost1(bdlist1,bdlist2)
+    cost=calCost1(bdlist1,bdlist2,m)
     bdNumber=bdNum(bdlist1)
     sim=simScore(bdNumber,cost)
     return(sim)
@@ -436,8 +461,4 @@ d1=read_csv('modifieddata1.csv')
 d2=read_csv('modifieddata2.csv')
 sim_Score(data1,data2)
 
-# for inter-annotated agreement
-createBD(data1) # create boundry list for a data file
-createBD(data1)$F1  # boundry list for speaker F1
-bdNum(createBD(data1))  # calculate the number of boundries for a file
 
