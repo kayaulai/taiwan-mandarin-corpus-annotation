@@ -1,6 +1,6 @@
-filename = "NCCU-TM049.csv"
-setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation")
-data = read_csv(paste0("7_dft_converted/", filename))[,]
+filename = "NCCU-TM025-CN-FM.csv"
+setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation")
+data = read_csv(paste0("5_dft_converted/", filename))
 
 data_owpl = data.frame(TurnSeq = integer(0), IUSeq = integer(0), Speaker = character(0), Utterance = character(0))
 splits = strsplit(as.character(data$Utterance)," ")
@@ -13,4 +13,4 @@ for(i in 1:nrow(data)){
 }
 filename = substr(filename, 1, (nchar(filename)-3))
 data_owpl = cbind(filename,data_owpl)
-write_csv(data_owpl, paste0("8_rez_input/", "NCCU-TM049.csv"))
+write_csv(data_owpl, paste0("6_rez_input/", filename, ".csv"))
