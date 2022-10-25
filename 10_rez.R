@@ -1,0 +1,5 @@
+library(rezonateR)
+ryan= importRez("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM025-CN-FM_Ryan.rez", concatFields = "Utterance")
+yujie= importRez("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM025-CN-FM_Yujie.rez", concatFields = "Utterance")
+rez_save(ryan, "ryan_split.Rdata")
+rez_save(yujie, "yujie_split.Rdata")
