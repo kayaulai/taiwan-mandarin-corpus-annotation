@@ -2,10 +2,9 @@ library(spacyr)
 library(tidyverse)
 library("stringr")
 library(dplyr)
-spacy_install(lang_models="zh_core_web_sm")
 spacy_initialize(model="zh_core_web_sm")
 
-file_name <- "NCCU-TM025-CN-FM.csv"  # Only change the file path to the input file in <1_auto_split>
+file_name <- "NCCU-TM009-CN-FFF.csv"  # Only change the file path to the input file in <1_auto_split>
 data <- read_csv(paste0("1_auto_split/", file_name))
 
 unlist(data$Utterance)
@@ -67,6 +66,17 @@ conjunct<-function(p){
     p[[i]]=str_replace_all(p[[i]],"< @","<@")
     p[[i]]=str_replace_all(p[[i]],"@ >","@>")
     p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@ @","@@")
+    p[[i]]=str_replace_all(p[[i]],"@\\] @","@]@")
+    p[[i]]=str_replace_all(p[[i]],"@ \\[@","@[@")
+    p[[i]]=str_replace_all(p[[i]],"@\\]\\] @","@]]@")
+    p[[i]]=str_replace_all(p[[i]],"@ \\[\\[@","@[[@")
+    p[[i]]=str_replace_all(p[[i]],"@([^ @])","@ \\1")
+    p[[i]]=str_replace_all(p[[i]],"([^ @])@","\\1 @")
     
     #Brackets: Removing spaces between brackets and content
     p[[i]]=str_replace_all(p[[i]],"\\( ","(")
@@ -86,6 +96,11 @@ conjunct<-function(p){
     p[[i]]=str_replace_all(p[[i]],"\\. \\.","\\.\\.")
     p[[i]]=str_replace_all(p[[i]],"\\.([^ .])","\\. \\1")
     
+    #Lengthening
+    p[[i]]=str_replace_all(p[[i]]," =","=")
+    p[[i]]=str_replace_all(p[[i]]," \\[=","[=")
+    p[[i]]=str_replace_all(p[[i]]," \\[\\[=","[[=")
+
   }
   return(p)
 }
