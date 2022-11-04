@@ -4,7 +4,7 @@ library("stringr")
 library(dplyr)
 spacy_initialize(model="zh_core_web_sm")
 
-file_name <- "NCCU-TM009-CN-FFF.csv"  # Only change the file path to the input file in <1_auto_split>
+file_name <- "NCCU-TM004-CN-FF.csv"  # Only change the file path to the input file in <1_auto_split>
 data <- read_csv(paste0("1_auto_split/", file_name))
 
 unlist(data$Utterance)
