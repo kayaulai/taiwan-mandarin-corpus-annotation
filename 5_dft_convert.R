@@ -2,7 +2,7 @@ library(tidyverse)
 library(dplyr)
 library(readr)
 
-setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
+setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
 data <- read.csv("NCCU-TM025-CN-FM_Yujie&Ryan.csv")
 
 
@@ -24,6 +24,8 @@ result= data %>%
                           gsub('\\.{3}', '(...)', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "^\\.{2}"),
                           gsub('^\\.{2}', '(.)', Utterance),Utterance)) %>%
+  mutate(Utterance=ifelse(str_detect(Utterance, " \\.{2} "),
+                        gsub(' \\.{2} ', ' (.) ', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "\\[{3}"),
                           gsub('\\[{3}', '[3', Utterance),Utterance))%>%
   mutate(Utterance=ifelse(str_detect(Utterance, "\\[{2}"),
