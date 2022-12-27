@@ -3,7 +3,7 @@ library(dplyr)
 library(readr)
 
 setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
-data <- read.csv("NCCU-TM001-CN-FM_Lu&Sirui.csv")
+data <- read.csv("NCCU-TM004-CN-FF_Haoran&Sabrina.csv")
 
 
 x = c()
@@ -45,4 +45,4 @@ result= data %>%
   mutate(TurnSeq=x) %>%
   mutate(IUSeq=seq(1,length(data$Utterance)))
 
-write.csv(result,"../5_dft_converted/NCCU-TM001-CN-FM.csv",fileEncoding = "UTF-8")
+write.csv(result,"../5_dft_converted/NCCU-TM004-CN-FF_Haoran&Sabrina.csv",fileEncoding = "UTF-8")
