@@ -1,4 +1,4 @@
-filename = "NCCU-TM025-CN-FM.csv"
+filename = "NCCU-TM001-CN-FM.csv"
 setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation")
 data = read_csv(paste0("5_dft_converted/", filename))
 

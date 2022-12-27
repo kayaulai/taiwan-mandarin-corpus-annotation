@@ -2,8 +2,8 @@ library(tidyverse)
 library(dplyr)
 library(readr)
 
-setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
-data <- read.csv("NCCU-TM025-CN-FM_Yujie&Ryan.csv")
+setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
+data <- read.csv("NCCU-TM001-CN-FM_Lu&Sirui.csv")
 
 
 x = c()
@@ -19,7 +19,8 @@ for (i in seq(1,length(data$Utterance))){
 data = data %>% mutate(Utterance = as.character(Utterance))
 
 result= data %>%
-  mutate(Utterance=case_when(str_detect(Utterance, "\\.{3}\\([:digit:]\\.[:digit:]\\)") ~                  gsub('^.{3}', '', Utterance), T ~ Utterance)) %>%
+  mutate(Utterance=case_when(str_detect(Utterance, "\\.{3}\\([:digit:]\\.[:digit:]\\)") ~
+                               gsub('^.{3}', '', Utterance), T ~ Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "\\.{3}"),
                           gsub('\\.{3}', '(...)', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "^\\.{2}"),
@@ -44,4 +45,4 @@ result= data %>%
   mutate(TurnSeq=x) %>%
   mutate(IUSeq=seq(1,length(data$Utterance)))
 
-write.csv(result,"../5_dft_converted/NCCU-TM025-CN-FM.csv",fileEncoding = "UTF-8")
+write.csv(result,"../5_dft_converted/NCCU-TM001-CN-FM.csv",fileEncoding = "UTF-8")
