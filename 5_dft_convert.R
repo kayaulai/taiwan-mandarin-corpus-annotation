@@ -27,6 +27,8 @@ result= data %>%
                           gsub('^\\.{2}', '(.)', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, " \\.{2} "),
                         gsub(' \\.{2} ', ' (.) ', Utterance),Utterance)) %>%
+  mutate(Utterance=ifelse(str_detect(Utterance, "--"),
+                          gsub('--', '—', Utterance),Utterance)) %>%
   mutate(Utterance=ifelse(str_detect(Utterance, "\\[{3}"),
                           gsub('\\[{3}', '[3', Utterance),Utterance))%>%
   mutate(Utterance=ifelse(str_detect(Utterance, "\\[{2}"),
