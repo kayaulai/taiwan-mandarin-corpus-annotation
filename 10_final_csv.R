@@ -39,7 +39,7 @@ finalRez = finalRez %>% addFieldForeign("token", "", "unit", "",
 
 
 finalCsv_token = finalRez$tokenDF %>% rez_rename(text = Utterance) %>% rez_select(turnSeq, unitSeq, participant, text)
-finalCsv_unit = finalRez$unitDF %>% select(-Text) %>% rez_rename(Text = Utterance) %>% rez_select(unitSeq, TurnSeq, Speaker, Text)
+finalCsv_unit = finalRez$unitDF %>% rez_rename(Text = Utterance) %>% rez_select(unitSeq, TurnSeq, Speaker, Text)
 
 
 rez_write_csv(finalCsv_token, "10_final_csv_owpl/" %+% substring(docname, 1, nchar(docname) - 4) %+% ".csv", quote = "needed")
