@@ -129,6 +129,7 @@ M_nccu = matrix(
     0, .25, 0, .25, .25, 1),
   nrow = 6)
 bounds_nccu = c(",", ".", "?", "+")
-sim_Score(nccu_t016[[1]], nccu_t016[[2]], m = M_nccu, boundaries = bounds_nccu)
-sim_Score(nccu_t025[[1]], nccu_t025[[2]], m = M_nccu, boundaries = bounds_nccu)
-sim_Score(nccu_t049[[1]], nccu_t049[[2]], m = M_nccu, boundaries = bounds_nccu)
+transCost = (1-M_nccu[,6])*.5
+sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
