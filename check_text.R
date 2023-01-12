@@ -121,15 +121,141 @@ anno2spl = anno2p %>% group_split(Speaker)
 rezTrans
 
 M_nccu = matrix(
-  c(1, .5, .25, .25, 0, 0,
-    .5, 1, .5, .5, 0, .25,
-    .25, .5, 1, .25, 0, 0,
-    .25, .5, .25, 1, 0, .25,
-    0,0,0,0,1, .25,
-    0, .25, 0, .25, .25, 1),
+  c(1, .5, .25, .25, 1, 0,
+    .5, 1, .5, .5, 1, .25,
+    .25, .5, 1, .25, 1, 0,
+    .25, .5, .25, 1, 1, .25,
+    1,1,1,1,1, 1,
+    0, .25, 0, .25, 1, 1),
   nrow = 6)
 bounds_nccu = c(",", ".", "?", "+")
 transCost = (1-M_nccu[,6])*.5
-sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
-sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
-sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t16_m = sim_Score(z[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t25_m = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t49_m = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t16_i = sim_Score(nccu_t016[[1]], nccu_t016[[2]])
+t25_i = sim_Score(nccu_t025[[1]], nccu_t025[[2]])
+t49_i = sim_Score(nccu_t049[[1]], nccu_t049[[2]])
+
+t16 = c(t16_i, t16_m)
+t25 = c(t25_i, t25_m)
+t49 = c(t49_i, t49_m)
+
+scores = rbind(t16, t25,  t49)
+colnames(scores) = c("SI", "SBI", "SM", "SBM")
+scores = scores %>% data.frame %>% rownames_to_column(var = "text") %>%
+  pivot_longer(cols = c("SI", "SBI", "SM", "SBM"))
+ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line()
+
+
+t16_m_detailed = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
+t25_m_detailed = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
+t49_m_detailed = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
+
+operations = rbind(t16_m_detailed, t25_m_detailed, t49_m_detailed)
+punct = c("\\?", "\\.", "--", ",")
+punct_regex = paste0(" (", paste0(punct, collapse = "|"), ")")
+
+getPuncts = function(text){
+  result = text$Utterance %>% str_extract_last(punct_regex)
+  result = substr(result[!is.na(result)], 2, nchar(result[!is.na(result)]))
+  case_when(result == "--" ~ "+", T ~ result)
+}
+
+
+getOpDist = function(report){
+  ops = report$record
+  puncts = c(",", ".", "?", "+")
+  result = data.frame()
+
+  for(punct in puncts){
+    ops_subst_1 = ops %>% filter(e1 == punct, e2 != ";", e2 != " ", type == "Substitution")
+    ops_subst_pt_1 = ops %>% filter(e1 == punct, e2 != ";", e2 != " ", type == "Substitution", postTranspose)
+    ops_unclass_1 = ops %>% filter(e1 == punct, e2 == ";", type == "Substitution")
+    ops_del_1 = ops %>% filter(e1 == punct, e2 == " ", type == "Substitution")
+    ops_trans_1 = ops %>% filter(e1 == punct, type == "Transposition")
+
+    subst_1 = nrow(ops_subst_1)
+    del_1 = nrow(ops_del_1)
+    unclass_1 = nrow(ops_unclass_1)
+    trans_pure_1 = nrow(ops_trans_1) - nrow(ops_subst_pt_1)
+
+
+    ops_subst_2 = ops %>% filter(e2 == punct, e1 != ";", e1 != " ", type == "Substitution")
+    ops_subst_pt_2 = ops %>% filter(e2 == punct, e1 != ";", e1 != " ", type == "Substitution", postTranspose)
+    ops_unclass_2 = ops %>% filter(e2 == punct, e1 == ";", type == "Substitution")
+    ops_del_2 = ops %>% filter(e2 == punct, e1 == " ", type == "Substitution")
+    ops_trans_2 = ops %>% filter(e2 == punct, type == "Transposition")
+
+    subst_2 = nrow(ops_subst_2)
+    del_2 = nrow(ops_del_2)
+    unclass_2 = nrow(ops_unclass_2)
+    trans_pure_2 = nrow(ops_trans_2) - nrow(ops_subst_pt_2)
+
+    correct = sum(report$fullMatches == punct)
+
+    result = rbind(result,
+                   rbind(ops_subst_1 %>% dplyr::rename(op = e2, punct = e1), ops_subst_2  %>% dplyr::rename(op = e1, punct = e2)) %>%
+                      group_by(op, punct) %>% count() %>%
+                      ungroup %>%
+                      dplyr::add_row(op = "tr", n = trans_pure_1 + trans_pure_2, punct = punct) %>%
+                      add_row(op = "del", n = del_1 + del_2, punct = punct) %>%
+                      add_row(op = "uc", n = unclass_1 + unclass_2, punct = punct) %>%
+                      add_row(op = "/", n = correct * 2, punct = punct)
+    )
+  }
+
+  result
+
+}
+
+
+reports = list("t16"= t16_m_detailed, "t25"=  t25_m_detailed, "t49" = t49_m_detailed)
+
+ops_all = lapply(names(reports), function(textID){
+  getOpDist(reports[[textID]]) %>% mutate(text = textID)
+}) %>% bind_rows
+
+library(ggpattern)
+
+ops_summ = ops_all %>%
+  filter(op != "uc") %>%
+  group_by(op, punct) %>% summarise(n = sum(n)) %>% group_by(punct) %>% mutate(perc = n / sum(n)) %>%
+  ungroup %>%
+  mutate(op = case_when(op == "/" ~ "Full match",
+                        op == "del" ~ "Deletion",
+                        op == "tr" ~ "Transposition",
+                        op == "," ~ "Substitution by ,",
+                        op == "." ~ "Substitution by .",
+                        op == "?" ~ "Substitution by ?",
+                        op == "+" ~ "Substitution by --",
+                        T ~ op) %>%
+           factor(levels = c("Full match", "Substitution by ,", "Substitution by .", "Substitution by ?", "Substitution by --", "Deletion", "Transposition"))) %>%
+  mutate(punct = case_when(punct == "+" ~ "--", T  ~ punct)%>% factor(levels = c("/", ",", ".", "?", "--"))) %>%
+  mutate(pattern = case_when(op == "Full match" ~ "stripe",
+                             op == "Substitution by ," ~ "crosshatch",
+                             op == "Substitution by ." ~ "point",
+                             op == "Substitution by ?" ~ "circle",
+                             op == "Substitution by --" ~ "stripe",
+                             op == "Deletion" ~ "crosshatch",
+                             op == "Transposition" ~ "point"))
+ggplot(ops_summ, aes(fill = op, x = punct, y =perc, pattern = pattern)) +  xlab ("Percentage") + ylab("Endnote") + geom_bar_pattern(stat="identity")
+
+
+ops_summ_2 = ops_all %>%
+  filter(op != "uc") %>%
+  group_by(op, punct) %>% summarise(n = sum(n)) %>% group_by(punct) %>% mutate(perc = n / sum(n)) %>%
+  ungroup %>%
+  mutate(op = case_when(op == "+" ~ "--",
+                        op == "/" ~ "match",
+                        T ~ op) %>%
+           factor(levels = c("match", ",", ".", "?", "--", "del", "tr"))) %>%
+  mutate(punct = case_when(punct == "+" ~ "--", T  ~ punct)%>% factor(levels = c("/", ",", ".", "?", "--")))
+ggplot(ops_summ_2, aes(fill = op, x = punct, y =perc)) +  xlab ("Percentage") + ylab("Endnote") + geom_bar(stat="identity", position = "dodge")
+
+
+ggplot(ops_summ_2 %>%
+         mutate(punct = case_when(punct == "," ~ "Continuing (,)",
+                                  punct == "." ~ "Falling (.)",
+                                  punct == "?" ~ "Appeal (?)",
+                                  punct == "--" ~ "Truncation (--)")), aes(x = op, y =perc)) +  xlab ("Endnote") + ylab("Percentage") + geom_bar(stat="identity") + facet_wrap(vars(punct), ncol = 2)
