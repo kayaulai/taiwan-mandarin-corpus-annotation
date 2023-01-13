@@ -1,9 +1,8 @@
 # Only change line 5 and line something at the end
 library(stringr)
 library(tidyverse)
-file_name <- "NCCU-TM004-CN-FF.csv"  # Only change the file path to the input file in <0_raw>
+file_name <- "NCCU-TM039-CN-FM.csv"  # Only change the file path to the input file in <0_raw
 TM <- read_csv(paste0("0_raw/", file_name))
-
 
 # ... separation
 dot3_sep<-function(d){
