@@ -5,11 +5,8 @@ library(stringi)
 library(segsimflex)
 
 
-anno1 = read_csv("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/old_5_manual_split/NCCU-TM016_Sunny.csv")
-anno2 = read_csv("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/old_5_manual_split/NCCU-TM016-CN-Ryan.csv")
-
-anno1 = rezTrans("C:\\Users\\kayau\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM025-CN-FM_Ryan.rez")
-anno2 = rezTrans("C:\\Users\\kayau\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM025-CN-FM_Yujie.rez")
+anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM001-CN-FM_Lu.rez")
+anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM001-CN-FM_Ryan.rez")
 
 str_strip_last = function(strings, regex){
   contains = str_ends(strings, regex)
@@ -58,6 +55,12 @@ stripPunct = function(data, punct = c("\\?", "\\.", "--", ",")){
  data %>% mutate(Utterance = str_strip_last(Utterance, punct_regex))
 }
 
+anno1 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Sabrina.csv")
+anno2 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Yujie Li.csv")
+
+anno1$Utterance = anno1$Utterance %>% str_replace_all("—", "--")
+anno2$Utterance = anno2$Utterance %>% str_replace_all("—", "--")
+
 anno1p = stripPunct(anno1)
 anno2p = stripPunct(anno2)
 
@@ -65,8 +68,8 @@ write_csv(anno1p %>% mutate(Utterance = unlist(Utterance)), "anno1.csv")
 write_csv(anno2p%>% mutate(Utterance = unlist(Utterance)), "anno2.csv")
 
 
-write_file(anno1p$Utterance %>% paste0(collapse = " "), "anno1col.csv")
-write_file(anno2p$Utterance %>% paste0(collapse = " "), "anno2col.csv")
+write_file(anno1p$Utterance %>%  paste0(collapse = " "), "anno1col.csv")
+write_file(anno2p$Utterance%>% paste0(collapse = " "), "anno2col.csv")
 
 
 write_csv(anno1p %>% group_by(Speaker) %>% summarise(Utt = paste0(Utterance, collapse = " ")) %>% select(Utt), "anno1col.csv")
@@ -130,29 +133,69 @@ M_nccu = matrix(
   nrow = 6)
 bounds_nccu = c(",", ".", "?", "+")
 transCost = (1-M_nccu[,6])*.5
-t16_m = sim_Score(z[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t09_m = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t16_m = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t25_m = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t49_m = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t09_i = sim_Score(nccu_t009[[1]], nccu_t009[[2]])
 t16_i = sim_Score(nccu_t016[[1]], nccu_t016[[2]])
+t36_i = sim_Score(nccu_t036[[1]], nccu_t036[[2]])
 t25_i = sim_Score(nccu_t025[[1]], nccu_t025[[2]])
 t49_i = sim_Score(nccu_t049[[1]], nccu_t049[[2]])
 
+t09_iaa_m = IAA(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t16_iaa_m = IAA(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t25_iaa_m = IAA(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t49_iaa_m = IAA(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t09_iaa_i = IAA(nccu_t009[[1]], nccu_t009[[2]])
+t16_iaa_i = IAA(nccu_t016[[1]], nccu_t016[[2]])
+t25_iaa_i = IAA(nccu_t025[[1]], nccu_t025[[2]])
+t49_iaa_i = IAA(nccu_t049[[1]], nccu_t049[[2]])
+
+t09 = c(t09_i, t09_m)
 t16 = c(t16_i, t16_m)
 t25 = c(t25_i, t25_m)
 t49 = c(t49_i, t49_m)
 
-scores = rbind(t16, t25,  t49)
+
+scores = rbind(t09, t16, t25,  t49)
 colnames(scores) = c("SI", "SBI", "SM", "SBM")
+
 scores = scores %>% data.frame %>% rownames_to_column(var = "text") %>%
-  pivot_longer(cols = c("SI", "SBI", "SM", "SBM"))
-ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line()
+  pivot_longer(cols = c("SI", "SBI", "SM", "SBM")) %>%
+  mutate(name = factor(name, levels = c("SI", "SBI", "SM", "SBM")))
+
+tikzDevice::tikz(file = "./scores.tex", width = 3.5, height = 1.5)
+ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line()  + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_x_discrete(labels = c("t09", "t16", "t25","t49")) + xlab("Text") + ylab("Similarity")
+dev.off()
+
+t09_iaa = c(t09_iaa_i, t09_iaa_m)
+t16_iaa = c(t16_iaa_i, t16_iaa_m)
+t25_iaa = c(t25_iaa_i, t25_iaa_m)
+t49_iaa = c(t49_iaa_i, t49_iaa_m)
 
 
+iaas = rbind(t09_iaa, t16_iaa, t25_iaa,  t49_iaa)
+colnames(iaas) = c("SI", "SBI", "SM", "SBM")
+
+iaas = iaas %>% data.frame %>% rownames_to_column(var = "text") %>%
+  pivot_longer(cols = c("SI", "SBI", "SM", "SBM")) %>%
+  mutate(name = factor(name, levels = c("SI", "SBI", "SM", "SBM")))
+
+tikzDevice::tikz(file = "./iaa.tex", width = 3.5, height = 1.5)
+ggplot(iaas, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line() + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + xlab("Text") + ylab("Cohen's $\\kappa$") + scale_x_discrete(labels = c("t09", "t16", "t25","t49"))
+dev.off()
+
+
+
+
+
+t09_m_detailed = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t16_m_detailed = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t25_m_detailed = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t49_m_detailed = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 
-operations = rbind(t16_m_detailed, t25_m_detailed, t49_m_detailed)
+operations = rbind(t09_m_detailed, t16_m_detailed, t25_m_detailed, t49_m_detailed)
 punct = c("\\?", "\\.", "--", ",")
 punct_regex = paste0(" (", paste0(punct, collapse = "|"), ")")
 
@@ -210,7 +253,7 @@ getOpDist = function(report){
 }
 
 
-reports = list("t16"= t16_m_detailed, "t25"=  t25_m_detailed, "t49" = t49_m_detailed)
+reports = list("t09" = t09_m_detailed, "t16"= t16_m_detailed, "t25"=  t25_m_detailed, "t49" = t49_m_detailed)
 
 ops_all = lapply(names(reports), function(textID){
   getOpDist(reports[[textID]]) %>% mutate(text = textID)
