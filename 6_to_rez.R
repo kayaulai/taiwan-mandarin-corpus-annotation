@@ -1,5 +1,6 @@
-filename = "NCCU-TM009-CN-FFF.csv"
-setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation")
+library(tidyverse)
+filename = "NCCU-TM036-CN-FF_Yujie Li.csv"
+setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation")
 data = read_csv(paste0("5_dft_converted/", filename))
 
 data_owpl = data.frame(TurnSeq = integer(0), IUSeq = integer(0), Speaker = character(0), Utterance = character(0))

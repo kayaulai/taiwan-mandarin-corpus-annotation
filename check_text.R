@@ -5,8 +5,8 @@ library(stringi)
 library(segsimflex)
 
 
-anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM001-CN-FM_Lu.rez")
-anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM001-CN-FM_Ryan.rez")
+anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Sabrina.rez")
+anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Yujie.rez")
 
 str_strip_last = function(strings, regex){
   contains = str_ends(strings, regex)
@@ -55,8 +55,8 @@ stripPunct = function(data, punct = c("\\?", "\\.", "--", ",")){
  data %>% mutate(Utterance = str_strip_last(Utterance, punct_regex))
 }
 
-anno1 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Sabrina.csv")
-anno2 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Yujie Li.csv")
+# anno1 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Sabrina.csv")
+# anno2 = read_csv("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split/NCCU-TM036-CN-FF_Yujie Li.csv")
 
 anno1$Utterance = anno1$Utterance %>% str_replace_all("—", "--")
 anno2$Utterance = anno2$Utterance %>% str_replace_all("—", "--")
@@ -66,11 +66,6 @@ anno2p = stripPunct(anno2)
 
 write_csv(anno1p %>% mutate(Utterance = unlist(Utterance)), "anno1.csv")
 write_csv(anno2p%>% mutate(Utterance = unlist(Utterance)), "anno2.csv")
-
-
-write_file(anno1p$Utterance %>%  paste0(collapse = " "), "anno1col.csv")
-write_file(anno2p$Utterance%>% paste0(collapse = " "), "anno2col.csv")
-
 
 write_csv(anno1p %>% group_by(Speaker) %>% summarise(Utt = paste0(Utterance, collapse = " ")) %>% select(Utt), "anno1col.csv")
 write_csv(anno2p %>% group_by(Speaker) %>% summarise(Utt = paste0(Utterance, collapse = " ")) %>% select(Utt), "anno2col.csv")
@@ -133,23 +128,31 @@ M_nccu = matrix(
   nrow = 6)
 bounds_nccu = c(",", ".", "?", "+")
 transCost = (1-M_nccu[,6])*.5
+t01_m = sim_Score(nccu_t001[[1]], nccu_t001[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t09_m = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t16_m = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t25_m = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t36_m = sim_Score(nccu_t036[[1]], nccu_t036[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t49_m = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t01_i = sim_Score(nccu_t001[[1]], nccu_t001[[2]])
 t09_i = sim_Score(nccu_t009[[1]], nccu_t009[[2]])
 t16_i = sim_Score(nccu_t016[[1]], nccu_t016[[2]])
-t36_i = sim_Score(nccu_t036[[1]], nccu_t036[[2]])
 t25_i = sim_Score(nccu_t025[[1]], nccu_t025[[2]])
+t36_i = sim_Score(nccu_t036[[1]], nccu_t036[[2]])
 t49_i = sim_Score(nccu_t049[[1]], nccu_t049[[2]])
 
+
+t01_iaa_m = IAA(nccu_t001[[1]], nccu_t001[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t09_iaa_m = IAA(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t16_iaa_m = IAA(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t25_iaa_m = IAA(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t36_iaa_m = IAA(nccu_t036[[1]], nccu_t036[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t49_iaa_m = IAA(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t01_iaa_i = IAA(nccu_t001[[1]], nccu_t001[[2]])
 t09_iaa_i = IAA(nccu_t009[[1]], nccu_t009[[2]])
 t16_iaa_i = IAA(nccu_t016[[1]], nccu_t016[[2]])
 t25_iaa_i = IAA(nccu_t025[[1]], nccu_t025[[2]])
+t36_iaa_i = IAA(nccu_t036[[1]], nccu_t036[[2]])
 t49_iaa_i = IAA(nccu_t049[[1]], nccu_t049[[2]])
 
 t09 = c(t09_i, t09_m)
