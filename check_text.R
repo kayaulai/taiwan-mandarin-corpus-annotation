@@ -5,8 +5,8 @@ library(stringi)
 library(segsimflex)
 
 
-anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Sabrina.rez")
-anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Yujie.rez")
+anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM004-CN-FM_Haoran.rez")
+anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM004-CN-FM_Sabrina.rez")
 
 str_strip_last = function(strings, regex){
   contains = str_ends(strings, regex)
@@ -129,12 +129,14 @@ M_nccu = matrix(
 bounds_nccu = c(",", ".", "?", "+")
 transCost = (1-M_nccu[,6])*.5
 t01_m = sim_Score(nccu_t001[[1]], nccu_t001[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t04_m = sim_Score(nccu_t004[[1]], nccu_t004[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t09_m = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t16_m = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t25_m = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t36_m = sim_Score(nccu_t036[[1]], nccu_t036[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t49_m = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t01_i = sim_Score(nccu_t001[[1]], nccu_t001[[2]])
+t04_i = sim_Score(nccu_t004[[1]], nccu_t004[[2]])
 t09_i = sim_Score(nccu_t009[[1]], nccu_t009[[2]])
 t16_i = sim_Score(nccu_t016[[1]], nccu_t016[[2]])
 t25_i = sim_Score(nccu_t025[[1]], nccu_t025[[2]])
@@ -143,12 +145,14 @@ t49_i = sim_Score(nccu_t049[[1]], nccu_t049[[2]])
 
 
 t01_iaa_m = IAA(nccu_t001[[1]], nccu_t001[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
+t04_iaa_m = IAA(nccu_t004[[1]], nccu_t004[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t09_iaa_m = IAA(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t16_iaa_m = IAA(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t25_iaa_m = IAA(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t36_iaa_m = IAA(nccu_t036[[1]], nccu_t036[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t49_iaa_m = IAA(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu)
 t01_iaa_i = IAA(nccu_t001[[1]], nccu_t001[[2]])
+t04_iaa_i = IAA(nccu_t004[[1]], nccu_t004[[2]])
 t09_iaa_i = IAA(nccu_t009[[1]], nccu_t009[[2]])
 t16_iaa_i = IAA(nccu_t016[[1]], nccu_t016[[2]])
 t25_iaa_i = IAA(nccu_t025[[1]], nccu_t025[[2]])
@@ -156,6 +160,7 @@ t36_iaa_i = IAA(nccu_t036[[1]], nccu_t036[[2]])
 t49_iaa_i = IAA(nccu_t049[[1]], nccu_t049[[2]])
 
 t01 = c(t01_i, t01_m)
+t04 = c(t09_i, t04_m)
 t09 = c(t09_i, t09_m)
 t16 = c(t16_i, t16_m)
 t25 = c(t25_i, t25_m)
@@ -163,7 +168,7 @@ t36 = c(t36_i, t36_m)
 t49 = c(t49_i, t49_m)
 
 
-scores = rbind(t01, t09, t16, t25,  t36, t49)
+scores = rbind(t01, t04, t09, t16, t25,  t36, t49)
 colnames(scores) = c("SI", "SBI", "SM", "SBM")
 
 scores = scores %>% data.frame %>% rownames_to_column(var = "text") %>%
@@ -171,7 +176,7 @@ scores = scores %>% data.frame %>% rownames_to_column(var = "text") %>%
   mutate(name = factor(name, levels = c("SI", "SBI", "SM", "SBM")))
 
 tikzDevice::tikz(file = "./scores.tex", width = 3.5, height = 1.5)
-ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line()  + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_x_discrete(labels = c("t01", "t09", "t16", "t25", "t36", "t49")) + xlab("Text") + ylab("Similarity")
+ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line()  + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_x_discrete(labels = c("t01", "t04", "t09", "t16", "t25", "t36", "t49")) + xlab("Text") + ylab("Similarity")
 dev.off()
 
 t01_iaa = c(t01_iaa_i, t01_iaa_m)
@@ -190,7 +195,7 @@ iaas = iaas %>% data.frame %>% rownames_to_column(var = "text") %>%
   mutate(name = factor(name, levels = c("SI", "SBI", "SM", "SBM")))
 
 tikzDevice::tikz(file = "./iaa.tex", width = 3.5, height = 1.5)
-ggplot(iaas, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line() + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + xlab("Text") + ylab("Cohen's $\\kappa$") + scale_x_discrete(labels = c("t01", "t09", "t16", "t25", "t36", "t49"))
+ggplot(iaas, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line() + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + xlab("Text") + ylab("Cohen's $\\kappa$") + scale_x_discrete(labels = c("t01", "t04", "t09", "t16", "t25", "t36", "t49"))
 dev.off()
 
 
