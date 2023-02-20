@@ -156,6 +156,7 @@ t36_iaa_i = IAA(nccu_t036[[1]], nccu_t036[[2]])
 t49_iaa_i = IAA(nccu_t049[[1]], nccu_t049[[2]])
 
 t01 = c(t01_i, t01_m)
+t04 = c(t01_i, t01_m)
 t09 = c(t09_i, t09_m)
 t16 = c(t16_i, t16_m)
 t25 = c(t25_i, t25_m)
@@ -163,7 +164,7 @@ t36 = c(t36_i, t36_m)
 t49 = c(t49_i, t49_m)
 
 
-scores = rbind(t01, t09, t16, t25,  t36, t49)
+scores = rbind(t01, t04, t09, t16, t25,  t36, t49)
 colnames(scores) = c("SI", "SBI", "SM", "SBM")
 
 scores = scores %>% data.frame %>% rownames_to_column(var = "text") %>%
@@ -175,6 +176,7 @@ ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name))
 dev.off()
 
 t01_iaa = c(t01_iaa_i, t01_iaa_m)
+t04_iaa = c(t04_iaa_i, t04_iaa_m)
 t09_iaa = c(t09_iaa_i, t09_iaa_m)
 t16_iaa = c(t16_iaa_i, t16_iaa_m)
 t25_iaa = c(t25_iaa_i, t25_iaa_m)
@@ -182,7 +184,7 @@ t36_iaa = c(t36_iaa_i, t36_iaa_m)
 t49_iaa = c(t49_iaa_i, t49_iaa_m)
 
 
-iaas = rbind(t09_iaa, t16_iaa, t25_iaa,  t49_iaa)
+iaas = rbind(t01_iaa, t04_iaa, t09_iaa, t16_iaa, t25_iaa, t36_iaa, t49_iaa)
 colnames(iaas) = c("SI", "SBI", "SM", "SBM")
 
 iaas = iaas %>% data.frame %>% rownames_to_column(var = "text") %>%
@@ -190,7 +192,7 @@ iaas = iaas %>% data.frame %>% rownames_to_column(var = "text") %>%
   mutate(name = factor(name, levels = c("SI", "SBI", "SM", "SBM")))
 
 tikzDevice::tikz(file = "./iaa.tex", width = 3.5, height = 1.5)
-ggplot(iaas, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line() + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + xlab("Text") + ylab("Cohen's $\\kappa$") + scale_x_discrete(labels = c("t01", "t09", "t16", "t25", "t36", "t49"))
+ggplot(iaas, aes(x = text, y = value, col = name, group = name, shape = name)) + geom_point() + geom_line() + scale_color_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + scale_shape_discrete(labels = c("$S_f(I)$", "$S_f^B(I)$", "$S_f(M)$", "$S_f^B(M)$"), name = "measure") + xlab("Text") + ylab("Cohen's $\\kappa$") + scale_x_discrete(labels = c("t01", "t04", "t09", "t16", "t25", "t36", "t49"))
 dev.off()
 
 
@@ -198,10 +200,11 @@ dev.off()
 
 
 t01_m_detailed = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
+t04_m_detailed = sim_Score(nccu_t004[[1]], nccu_t004[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t09_m_detailed = sim_Score(nccu_t009[[1]], nccu_t009[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t16_m_detailed = sim_Score(nccu_t016[[1]], nccu_t016[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t25_m_detailed = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
-t25_m_detailed = sim_Score(nccu_t025[[1]], nccu_t025[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
+t36_m_detailed = sim_Score(nccu_t036[[1]], nccu_t036[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 t49_m_detailed = sim_Score(nccu_t049[[1]], nccu_t049[[2]], transCost = transCost, m = M_nccu, boundaries = bounds_nccu, record = T)
 
 operations = rbind(t09_m_detailed, t16_m_detailed, t25_m_detailed, t49_m_detailed)
