@@ -180,6 +180,7 @@ ggplot(scores, aes(x = text, y = value, col = name, group = name, shape = name))
 dev.off()
 
 t01_iaa = c(t01_iaa_i, t01_iaa_m)
+t04_iaa = c(t04_iaa_i, t04_iaa_m)
 t09_iaa = c(t09_iaa_i, t09_iaa_m)
 t16_iaa = c(t16_iaa_i, t16_iaa_m)
 t25_iaa = c(t25_iaa_i, t25_iaa_m)
