@@ -1,8 +1,8 @@
 library(rezonateR)
 
 setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation")
-docname = "NCCU-TM049.rez"
-finalRez = importRez("old_9_rez_file/" %+% docname, concatFields = "Utterance")
+docname = "NCCU-TM025-CN-FM.rez"
+finalRez = importRez("9_final_split/" %+% docname, concatFields = "Utterance")
 finalRez = finalRez %>% addUnitSeq("token")
 finalRez$tokenDF = finalRez$tokenDF %>% rez_mutate(Utterance = case_when(str_detect(Utterance, "\\[{0,1}\\.\\.\\]{0,1}") & !str_detect(Utterance, "\\.\\.\\.") ~ str_replace(Utterance, "\\.\\.", "(.)"), T ~ Utterance))
 
