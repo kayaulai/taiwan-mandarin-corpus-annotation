@@ -1,5 +1,5 @@
 library(tidyverse)
-filename = "NCCU-TM036-CN-FF_Yujie Li.csv"
+filename = "NCCU-TM039-CN-FM_Lu&Yuting.csv"
 setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation")
 data = read_csv(paste0("5_dft_converted/", filename))
 

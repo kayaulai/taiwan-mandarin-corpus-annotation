@@ -1,12 +1,10 @@
 library(tidyverse)
-library(compare)
-library(levenR)
 library(stringi)
 library(segsimflex)
 
 
-anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Sabrina.rez")
-anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM036-CN-FF_Yujie.rez")
+anno1 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM004-CN-FM_Haoran.rez")
+anno2 = rezTrans("C:\\Users\\User\\Documents\\GitHub\\taiwan-mandarin-corpus-annotation\\8_manual_split\\NCCU-TM004-CN-FM_Sabrina.rez")
 
 str_strip_last = function(strings, regex){
   contains = str_ends(strings, regex)

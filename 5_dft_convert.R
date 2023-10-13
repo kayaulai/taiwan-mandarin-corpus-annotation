@@ -2,9 +2,8 @@ library(tidyverse)
 library(dplyr)
 library(readr)
 
-setwd("C:/Users/kayau/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
-setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/8_manual_split")
-data <- read.csv("NCCU-TM036-CN-FF_Yujie Li.csv")
+setwd("C:/Users/User/Documents/GitHub/taiwan-mandarin-corpus-annotation/4_final_tokenised")
+data <- read.csv("NCCU-TM039-CN-FM_Lu&Yuting.csv")
 
 
 x = data$Turn
@@ -49,4 +48,4 @@ result= data %>%
   mutate(Speaker = speaker) %>%
   mutate(IUSeq=seq(1,length(data$Utterance)))
 
-write.csv(result,"../5_dft_converted/NCCU-TM036-CN-FF_Yujie Li.csv",fileEncoding = "UTF-8")
+write.csv(result,"../5_dft_converted/NCCU-TM039-CN-FM_Lu&Yuting.csv",fileEncoding = "UTF-8")
